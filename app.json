@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "birds",
-    "slug": "birds",
+    "name": "react-native-motion-lab",
+    "slug": "react-native-motion-lab",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "birds",
+    "scheme": "react-native-motion-lab",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
