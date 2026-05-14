@@ -8,6 +8,7 @@ interface UseBirdsSceneOptions {
   formationEnabled: boolean;
   nameText: string;
   selectedShape: BirdsShapeTool;
+  skyPresetIndex: number;
 }
 
 const DISTURBANCE_STRENGTH = 3.5;
@@ -21,6 +22,7 @@ export const useBirdsScene = ({
   formationEnabled,
   nameText,
   selectedShape,
+  skyPresetIndex,
 }: UseBirdsSceneOptions) => {
   const layoutRef = useRef({ width: 1, height: 1 });
   const disturbanceRef = useRef<DisturbanceState>({ x: 0, y: 0, strength: 0 });
@@ -30,10 +32,15 @@ export const useBirdsScene = ({
   const uploadFormationTargetsRef = useRef<
     (shape: BirdsShapeTool, name: string) => void
   >(() => {});
+  const skyPresetIndexRef = useRef(skyPresetIndex);
 
   useEffect(() => {
     formationEnabledRef.current = formationEnabled;
   }, [formationEnabled]);
+
+  useEffect(() => {
+    skyPresetIndexRef.current = skyPresetIndex;
+  }, [skyPresetIndex]);
 
   useEffect(() => {
     selectedShapeRef.current = selectedShape;
@@ -52,6 +59,7 @@ export const useBirdsScene = ({
         nameTextRef,
         disturbanceRef,
         uploadFormationTargetsRef,
+        skyPresetIndexRef,
       }),
     [],
   );

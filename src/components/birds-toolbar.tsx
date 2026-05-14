@@ -1,10 +1,12 @@
 import { GlassView, isGlassEffectAPIAvailable } from "expo-glass-effect";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Keyboard,
   Platform,
   Pressable,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from "react-native";
@@ -25,16 +27,20 @@ interface BirdsToolbarProps {
   onNameSubmit: (nameText: string) => void;
   onNameModeChange: (enabled: boolean) => void;
   onShapeSelect?: (shape: BirdsShapeTool) => void;
+  /** Cycles murmuration sky preset (GPU). */
+  skyPresetShortLabel?: string;
+  skyPresetLabel?: string;
+  onCycleSkyPreset?: () => void;
 }
 
-const shapeTools: Array<{ id: BirdsShapeTool; label: string }> = [
+const shapeTools: { id: BirdsShapeTool; label: string }[] = [
   { id: "heart", label: "♡" },
   { id: "star", label: "☆" },
   { id: "moon", label: "☾" },
   { id: "text", label: "T" },
 ];
 
-const COMPACT_WIDTH = 224;
+const COMPACT_WIDTH = 288;
 const EXPANDED_WIDTH = 332;
 const TOOLBAR_HEIGHT = 56;
 
@@ -110,6 +116,9 @@ export const BirdsToolbar = ({
   onNameSubmit,
   onNameModeChange,
   onShapeSelect,
+  skyPresetShortLabel,
+  skyPresetLabel,
+  onCycleSkyPreset,
 }: BirdsToolbarProps) => {
   const [activeTool, setActiveTool] = useState<BirdsShapeTool | null>(
     nameModeEnabled ? "text" : null,
@@ -274,6 +283,31 @@ export const BirdsToolbar = ({
               onPress={() => selectTool(tool.id)}
             />
           ))}
+          {onCycleSkyPreset != null && skyPresetShortLabel != null ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                skyPresetLabel != null
+                  ? `Sky: ${skyPresetLabel}. Tap for next.`
+                  : "Cycle sky look"
+              }
+              onPress={onCycleSkyPreset}
+              hitSlop={6}
+              style={({ pressed }) => [
+                styles.skyButton,
+                pressed && styles.skyButtonPressed,
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="weather-partly-cloudy"
+                size={20}
+                color="#0c1420"
+              />
+              <Text style={styles.skyShortLabel} numberOfLines={1}>
+                {skyPresetShortLabel}
+              </Text>
+            </Pressable>
+          ) : null}
         </Animated.View>
 
         <Animated.View
@@ -381,6 +415,26 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "700",
     lineHeight: 26,
+  },
+  skyButton: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 44,
+    height: 40,
+    borderRadius: 11,
+    marginLeft: 2,
+    gap: 1,
+  },
+  skyButtonPressed: {
+    backgroundColor: "rgba(12, 20, 32, 0.08)",
+  },
+  skyShortLabel: {
+    color: "#0c1420",
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 0.2,
+    maxWidth: 44,
   },
   textToolLabel: {
     fontSize: 19,

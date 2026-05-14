@@ -1,7 +1,5 @@
-import { BirdsScreen } from "@/screens/BirdsScreen";
+import { HubScreen } from "@/screens/HubScreen";
 
-const Index = () => {
-  return <BirdsScreen />;
-};
-
-export default Index;
+export default function Index() {
+  return <HubScreen />;
+}

@@ -1,9 +1,10 @@
 import type { BirdsShapeTool } from "@/components/birds-toolbar";
-import type { RefObject } from "react";
 import type { Scene } from "@/hooks/useWebGPU";
+import type { RefObject } from "react";
 import {
   BACKGROUND_VERTEX_COUNT,
   BIRD_COUNT,
+  BIRD_RENDER_MULTIPLIER,
   BIRD_VERTEX_COUNT,
   FLOATS_PER_VEC4,
   GPUBufferUsageFlags,
@@ -15,6 +16,7 @@ import {
   computePositionWGSL,
   computeVelocityWGSL,
 } from "./shaders";
+import { BIRDS_SKY_PRESETS, clampSkyPresetIndex } from "./sky-config";
 
 export interface DisturbanceState {
   x: number;
@@ -34,6 +36,7 @@ export interface BirdsControls {
   uploadFormationTargetsRef: RefObject<
     (shape: BirdsShapeTool, name: string) => void
   >;
+  skyPresetIndexRef: RefObject<number>;
 }
 
 const UNIFORM_BUFFER_SIZE = 48;
@@ -47,9 +50,15 @@ const seedBirdState = (aspectScale: number) => {
 
   for (let i = 0; i < BIRD_COUNT; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const radius = Math.sqrt(Math.random());
-    const x = (Math.random() * 2.3 - 1.15) * radius;
-    const y = (Math.random() * 2.1 - 1.05) * aspectScale * radius;
+    const ribbonT = Math.random();
+    const ribbonX =
+      Math.sin((ribbonT * 2.25 - 0.18) * Math.PI * 2) * 0.34 +
+      Math.sin((ribbonT * 4.2 + 0.35) * Math.PI * 2) * 0.045;
+    const ribbonY = (0.78 - ribbonT * 1.48) * aspectScale;
+    const laneSide = Math.random() > 0.5 ? 1 : -1;
+    const lane = laneSide * Math.pow(Math.random(), 2.15) * 0.11;
+    const x = ribbonX + lane + (Math.random() - 0.5) * 0.08;
+    const y = ribbonY + (Math.random() - 0.5) * aspectScale * 0.08;
     const speed = 0.12 + Math.random() * 0.34;
 
     positionData[i * FLOATS_PER_VEC4 + 0] = x;
@@ -78,7 +87,8 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
   return ({ context, device, presentationFormat, canvas }) => {
     const aspectScale = canvas.height / canvas.width;
 
-    const { positionData, velocityData, phaseData } = seedBirdState(aspectScale);
+    const { positionData, velocityData, phaseData } =
+      seedBirdState(aspectScale);
 
     const makeStorageBuffer = (data: Float32Array) => {
       const buffer = device.createBuffer({
@@ -117,7 +127,11 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
       device.queue.writeBuffer(
         formationTargetBuffer,
         0,
-        createFormationTargets(nextShape, nextName, aspectScale) as BufferSource,
+        createFormationTargets(
+          nextShape,
+          nextName,
+          aspectScale,
+        ) as BufferSource,
       );
     };
 
@@ -135,7 +149,23 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
       fragment: {
         module: device.createShaderModule({ code: birdRenderWGSL }),
         entryPoint: "fragmentMain",
-        targets: [{ format: presentationFormat }],
+        targets: [
+          {
+            format: presentationFormat,
+            blend: {
+              color: {
+                srcFactor: "src-alpha",
+                dstFactor: "one-minus-src-alpha",
+                operation: "add",
+              },
+              alpha: {
+                srcFactor: "one",
+                dstFactor: "one-minus-src-alpha",
+                operation: "add",
+              },
+            },
+          },
+        ],
       },
       primitive: { topology: "triangle-list" },
     });
@@ -213,7 +243,14 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
       const writeIndex = 1 - stateIndex;
 
       const disturbance = controls.disturbanceRef.current;
-      disturbance.strength *= Math.pow(DISTURBANCE_DECAY_PER_FRAME, deltaTime * 60);
+      disturbance.strength *= Math.pow(
+        DISTURBANCE_DECAY_PER_FRAME,
+        deltaTime * 60,
+      );
+
+      const skyPresetIndex = clampSkyPresetIndex(
+        controls.skyPresetIndexRef.current,
+      );
 
       device.queue.writeBuffer(
         uniformBuffer,
@@ -222,7 +259,7 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
           aspectScale,
           time,
           deltaTime,
-          0,
+          skyPresetIndex,
           disturbance.x,
           disturbance.y,
           disturbance.strength,
@@ -248,11 +285,13 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
       positionPass.dispatchWorkgroups(workgroups);
       positionPass.end();
 
+      const clear = BIRDS_SKY_PRESETS[skyPresetIndex].clearColor;
+
       const renderPass = commandEncoder.beginRenderPass({
         colorAttachments: [
           {
             view: context.getCurrentTexture().createView(),
-            clearValue: { r: 0.72, g: 0.7, b: 0.98, a: 1 },
+            clearValue: { r: clear.r, g: clear.g, b: clear.b, a: 1 },
             loadOp: "clear",
             storeOp: "store",
           },
@@ -261,7 +300,10 @@ export const makeBirdsScene = (controls: BirdsControls): Scene => {
 
       renderPass.setPipeline(renderPipeline);
       renderPass.setBindGroup(0, renderBindGroups[writeIndex]);
-      renderPass.draw(BACKGROUND_VERTEX_COUNT + BIRD_COUNT * BIRD_VERTEX_COUNT);
+      renderPass.draw(
+        BACKGROUND_VERTEX_COUNT +
+          BIRD_COUNT * BIRD_RENDER_MULTIPLIER * BIRD_VERTEX_COUNT,
+      );
       renderPass.end();
 
       device.queue.submit([commandEncoder.finish()]);

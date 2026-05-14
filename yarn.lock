@@ -3722,44 +3722,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"birds@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "birds@workspace:."
-  dependencies:
-    "@react-navigation/bottom-tabs": "npm:^7.15.5"
-    "@react-navigation/elements": "npm:^2.9.10"
-    "@react-navigation/native": "npm:^7.1.33"
-    "@types/react": "npm:~19.2.2"
-    "@webgpu/types": "npm:^0.1.69"
-    eslint: "npm:^9.0.0"
-    eslint-config-expo: "npm:~55.0.0"
-    expo: "npm:~55.0.23"
-    expo-constants: "npm:~55.0.16"
-    expo-device: "npm:~55.0.16"
-    expo-font: "npm:~55.0.7"
-    expo-glass-effect: "npm:~55.0.11"
-    expo-image: "npm:~55.0.10"
-    expo-linking: "npm:~55.0.15"
-    expo-router: "npm:~55.0.14"
-    expo-splash-screen: "npm:~55.0.20"
-    expo-status-bar: "npm:~55.0.6"
-    expo-symbols: "npm:~55.0.8"
-    expo-system-ui: "npm:~55.0.17"
-    expo-web-browser: "npm:~55.0.15"
-    react: "npm:19.2.0"
-    react-dom: "npm:19.2.0"
-    react-native: "npm:0.83.6"
-    react-native-gesture-handler: "npm:~2.30.0"
-    react-native-reanimated: "npm:4.2.1"
-    react-native-safe-area-context: "npm:~5.6.2"
-    react-native-screens: "npm:~4.23.0"
-    react-native-web: "npm:~0.21.0"
-    react-native-wgpu: "npm:^0.5.11"
-    react-native-worklets: "npm:0.7.4"
-    typescript: "npm:~5.9.2"
-  languageName: unknown
-  linkType: soft
-
 "bplist-creator@npm:0.1.0":
   version: 0.1.0
   resolution: "bplist-creator@npm:0.1.0"
@@ -7812,6 +7774,44 @@ __metadata:
   checksum: 10c0/28cebd5f1f3632864ff5e342278721d1e5e38627ae73859a8814012116ef15c629fee7137a6c9c97bb05d94bbe639b0b47e69b36fc2735ab53ed31570140663f
   languageName: node
   linkType: hard
+
+"react-native-motion-lab@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "react-native-motion-lab@workspace:."
+  dependencies:
+    "@react-navigation/bottom-tabs": "npm:^7.15.5"
+    "@react-navigation/elements": "npm:^2.9.10"
+    "@react-navigation/native": "npm:^7.1.33"
+    "@types/react": "npm:~19.2.2"
+    "@webgpu/types": "npm:^0.1.69"
+    eslint: "npm:^9.0.0"
+    eslint-config-expo: "npm:~55.0.0"
+    expo: "npm:~55.0.23"
+    expo-constants: "npm:~55.0.16"
+    expo-device: "npm:~55.0.16"
+    expo-font: "npm:~55.0.7"
+    expo-glass-effect: "npm:~55.0.11"
+    expo-image: "npm:~55.0.10"
+    expo-linking: "npm:~55.0.15"
+    expo-router: "npm:~55.0.14"
+    expo-splash-screen: "npm:~55.0.20"
+    expo-status-bar: "npm:~55.0.6"
+    expo-symbols: "npm:~55.0.8"
+    expo-system-ui: "npm:~55.0.17"
+    expo-web-browser: "npm:~55.0.15"
+    react: "npm:19.2.0"
+    react-dom: "npm:19.2.0"
+    react-native: "npm:0.83.6"
+    react-native-gesture-handler: "npm:~2.30.0"
+    react-native-reanimated: "npm:4.2.1"
+    react-native-safe-area-context: "npm:~5.6.2"
+    react-native-screens: "npm:~4.23.0"
+    react-native-web: "npm:~0.21.0"
+    react-native-wgpu: "npm:^0.5.11"
+    react-native-worklets: "npm:0.7.4"
+    typescript: "npm:~5.9.2"
+  languageName: unknown
+  linkType: soft
 
 "react-native-reanimated@npm:4.2.1":
   version: 4.2.1

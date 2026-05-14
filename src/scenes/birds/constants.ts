@@ -1,4 +1,5 @@
-export const BIRD_COUNT = 4000;
+export const BIRD_COUNT = 10000;
+export const BIRD_RENDER_MULTIPLIER = 1;
 export const BIRD_VERTEX_COUNT = 9;
 export const BACKGROUND_VERTEX_COUNT = 6;
 export const FLOATS_PER_VEC4 = 4;
