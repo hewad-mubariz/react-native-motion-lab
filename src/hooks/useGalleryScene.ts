@@ -1,18 +1,18 @@
-import { makeMuseumScene, type CameraState } from "@/scenes/museum";
-import { MUSEUM_CONFIG } from "@/scenes/museum/config";
+import { makeGalleryScene, type CameraState } from "@/scenes/gallery";
+import { GALLERY_CONFIG } from "@/scenes/gallery/config";
 import {
   cameraBasis,
   computePaintingFocusPose,
   galleryPainting,
   type GalleryPainting,
-} from "@/scenes/museum/geometry";
+} from "@/scenes/gallery/geometry";
 import { fetchArticArtworks, type ArticArtwork } from "@/services/artic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LayoutChangeEvent } from "react-native";
 import { useWebGPU } from "./useWebGPU";
 
 /**
- * React-side wrapper around the museum scene.
+ * React-side wrapper around the art gallery scene.
  *
  * Gestures drive the camera through four refs the scene reads each frame:
  *   - targetCameraRef  : where the camera wants to be
@@ -43,7 +43,7 @@ interface PaintingHit {
   painting: GalleryPainting;
 }
 
-export const useMuseumScene = () => {
+export const useGalleryScene = () => {
   const layoutRef = useRef({ width: 1, height: 1 });
   const targetCameraRef = useRef<CameraState>({
     walkDist: 0,
@@ -57,8 +57,8 @@ export const useMuseumScene = () => {
   });
   const dragModeRef = useRef(false);
   const isWalkingRef = useRef(false);
-  const targetFovYRef = useRef(MUSEUM_CONFIG.camera.fovY);
-  const currentFovYRef = useRef(MUSEUM_CONFIG.camera.fovY);
+  const targetFovYRef = useRef(GALLERY_CONFIG.camera.fovY);
+  const currentFovYRef = useRef(GALLERY_CONFIG.camera.fovY);
   const dragStartRef = useRef({ yaw: 0, pitch: 0 });
   const [artworks, setArtworks] = useState<ArticArtwork[]>([]);
   const [artworksLoading, setArtworksLoading] = useState(true);
@@ -72,7 +72,7 @@ export const useMuseumScene = () => {
 
       try {
         const nextArtworks = await fetchArticArtworks(
-          Math.min(MUSEUM_CONFIG.painting.slotCount, 80),
+          Math.min(GALLERY_CONFIG.painting.slotCount, 80),
         );
 
         if (!cancelled) {
@@ -100,7 +100,7 @@ export const useMuseumScene = () => {
 
   const scene = useMemo(
     () =>
-      makeMuseumScene(
+      makeGalleryScene(
         {
           targetCameraRef,
           currentCameraRef,
@@ -138,7 +138,7 @@ export const useMuseumScene = () => {
    */
   const buildTapRay = useCallback((tapX: number, tapY: number) => {
     const { width, height } = layoutRef.current;
-    const cam = MUSEUM_CONFIG.camera;
+    const cam = GALLERY_CONFIG.camera;
     const { yaw, pitch, walkDist } = currentCameraRef.current;
 
     const ndcX = (tapX / width) * 2 - 1;
@@ -174,7 +174,7 @@ export const useMuseumScene = () => {
    */
   const intersectPaintings = useCallback(
     (ray: ReturnType<typeof buildTapRay>): PaintingHit | null => {
-      const { frameThickness, slotCount } = MUSEUM_CONFIG.painting;
+      const { frameThickness, slotCount } = GALLERY_CONFIG.painting;
       const { eyeX, eyeY, eyeZ, dirX, dirY, dirZ, walkDist } = ray;
 
       if (Math.abs(dirX) < 1e-4) return null;
@@ -205,7 +205,7 @@ export const useMuseumScene = () => {
   );
 
   const exitFocus = useCallback(() => {
-    targetFovYRef.current = MUSEUM_CONFIG.camera.fovY;
+    targetFovYRef.current = GALLERY_CONFIG.camera.fovY;
   }, []);
 
   const focusPainting = useCallback((hit: PaintingHit) => {
@@ -213,9 +213,9 @@ export const useMuseumScene = () => {
     targetCameraRef.current = computePaintingFocusPose(
       hit.slot,
       currentCameraRef.current,
-      MUSEUM_CONFIG.camera,
+      GALLERY_CONFIG.camera,
     );
-    targetFovYRef.current = MUSEUM_CONFIG.camera.focusFovY;
+    targetFovYRef.current = GALLERY_CONFIG.camera.focusFovY;
   }, []);
 
   const handleTap = useCallback(
@@ -252,7 +252,7 @@ export const useMuseumScene = () => {
   const handleDragUpdate = useCallback(
     (translationX: number, translationY: number) => {
       const { width, height } = layoutRef.current;
-      const cam = MUSEUM_CONFIG.camera;
+      const cam = GALLERY_CONFIG.camera;
 
       // Drag-the-world convention: dragging right moves the world right,
       // which means the camera turns LEFT (yaw decreases). Drag down ->
@@ -296,7 +296,7 @@ export const useMuseumScene = () => {
     const cur = currentCameraRef.current;
     const tgt = targetCameraRef.current;
     const sign = Math.cos(cur.yaw) >= 0 ? 1 : -1;
-    const step = MUSEUM_CONFIG.camera.doubleTapStepDist;
+    const step = GALLERY_CONFIG.camera.doubleTapStepDist;
     targetCameraRef.current = {
       walkDist: cur.walkDist + sign * step,
       yaw: tgt.yaw,

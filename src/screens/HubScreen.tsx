@@ -36,8 +36,8 @@ export const HubScreen = () => {
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Open Museum corridor"
-          onPress={() => router.push("/museum")}
+          accessibilityLabel="Open art gallery corridor"
+          onPress={() => router.push("/gallery")}
           style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
         >
           <Ionicons
@@ -46,7 +46,7 @@ export const HubScreen = () => {
             color="rgba(8, 10, 16, 0.92)"
           />
           <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>Museum</Text>
+            <Text style={styles.cardTitle}>Art gallery</Text>
             <Text style={styles.cardHint}>Walk the gallery</Text>
           </View>
           <Ionicons name="chevron-forward" size={22} color="rgba(8,10,16,0.35)" />

@@ -2,7 +2,7 @@
  * JS-side mirrors of the geometric math the shader performs.
  */
 
-import { MUSEUM_CONFIG } from "./config";
+import { GALLERY_CONFIG } from "./config";
 
 export type Vec3 = readonly [number, number, number];
 
@@ -74,7 +74,7 @@ export const galleryPainting = (
     halfWidth: baseHalfW,
     halfHeight: baseHalfH,
     frameThickness,
-  } = MUSEUM_CONFIG.painting;
+  } = GALLERY_CONFIG.painting;
   const pcs = Math.max(1, Math.round(piecesPerStripe));
   const stripeIdx = Math.floor(slotIdx / pcs);
   const pieceIdx = slotIdx % pcs;
@@ -100,7 +100,7 @@ export const galleryPainting = (
     pcs,
     baseHalfW,
   );
-  const { height: corridorH } = MUSEUM_CONFIG.corridor;
+  const { height: corridorH } = GALLERY_CONFIG.corridor;
   const h2 = corridorH * 0.5;
   const cyRaw =
     stripeZ * (-0.04 + fract(hash11(stripeIdx * 2.9)) * (0.095 - -0.04));
@@ -112,21 +112,21 @@ export const galleryPainting = (
     baseHalfH *
     (0.5 +
       fract(hash11(stripeIdx * 2.1 + pieceIdx * 3.7 + 0.09)) * (1.15 - 0.5));
-  const halfH = Math.min(rawHalfH, MUSEUM_CONFIG.painting.maxHalfHeight);
+  const halfH = Math.min(rawHalfH, GALLERY_CONFIG.painting.maxHalfHeight);
 
   const floorClear = Math.max(
-    MUSEUM_CONFIG.painting.floorClearance,
+    GALLERY_CONFIG.painting.floorClearance,
     corridorH * 0.19,
   );
   const ceilPad = Math.max(
-    MUSEUM_CONFIG.painting.ceilingClearance,
+    GALLERY_CONFIG.painting.ceilingClearance,
     corridorH * 0.06,
   );
   const minCy = -h2 + floorClear + halfH + frameThickness;
   const maxCy = h2 - ceilPad - halfH - frameThickness;
   const cy = Math.max(minCy, Math.min(maxCy, cyRaw));
 
-  const { halfWidth: corridorHw } = MUSEUM_CONFIG.corridor;
+  const { halfWidth: corridorHw } = GALLERY_CONFIG.corridor;
   const wallX = side * corridorHw;
   const inset = 0.01 + slotIdx * 0.000045;
   const x = wallX - side * inset;
@@ -184,7 +184,7 @@ export interface PaintingFocusPose {
 export const computePaintingFocusPose = (
   slot: number,
   cur: PaintingFocusPose,
-  cam: (typeof MUSEUM_CONFIG)["camera"],
+  cam: (typeof GALLERY_CONFIG)["camera"],
 ): PaintingFocusPose => {
   let w = cur.walkDist;
   for (let i = 0; i < 14; i++) {

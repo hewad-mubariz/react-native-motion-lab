@@ -27,7 +27,7 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" />
             <Stack.Screen name="birds" />
-            <Stack.Screen name="museum" />
+            <Stack.Screen name="gallery" />
           </Stack>
         </View>
       </SafeAreaProvider>

@@ -1,10 +1,10 @@
 import type { Scene } from "@/hooks/useWebGPU";
 import type { ArticArtwork } from "@/services/artic";
 import type { RefObject } from "react";
-import { MUSEUM_CONFIG } from "./config";
+import { GALLERY_CONFIG } from "./config";
 import { cameraBasis } from "./geometry";
 import { mat4Create, mat4LookAt, mat4Multiply, mat4Perspective } from "./math";
-import { museumWGSL } from "./shaders";
+import { galleryWGSL } from "./shaders";
 
 const UNIFORM = 0x40;
 const COPY_DST = 0x8;
@@ -69,7 +69,7 @@ export interface CameraState {
  * The three modes are exclusive in the React gesture layer
  * (Gesture.Race), so we don't need to worry about all three active at once.
  */
-export interface MuseumControls {
+export interface GalleryControls {
   targetCameraRef: RefObject<CameraState>;
   currentCameraRef: RefObject<CameraState>;
   targetFovYRef: RefObject<number>;
@@ -78,7 +78,7 @@ export interface MuseumControls {
   isWalkingRef: RefObject<boolean>;
 }
 
-export interface MuseumSceneOptions {
+export interface GallerySceneOptions {
   artworks?: ArticArtwork[];
   onArtworkLoaded?: (count: number) => void;
 }
@@ -157,7 +157,7 @@ const loadArtworkTextures = async (
       const response = await fetch(artwork.imageUrl, {
         headers: {
           Referer: "https://www.artic.edu/",
-          "User-Agent": "Mozilla/5.0 ReactNativeWebGPU Museum",
+          "User-Agent": "Mozilla/5.0 ReactNativeWebGPU Gallery",
         },
       });
       if (!response.ok) continue;
@@ -179,12 +179,12 @@ const loadArtworkTextures = async (
   onArtworkLoaded?.(slots);
 };
 
-export const makeMuseumScene = (
-  controls: MuseumControls,
-  options: MuseumSceneOptions = {},
+export const makeGalleryScene = (
+  controls: GalleryControls,
+  options: GallerySceneOptions = {},
 ): Scene => {
   return ({ context, device, presentationFormat, canvas }) => {
-    const shader = device.createShaderModule({ code: museumWGSL });
+    const shader = device.createShaderModule({ code: galleryWGSL });
 
     const makePipeline = (vsEntry: string, fsEntry: string) =>
       device.createRenderPipeline({
@@ -269,7 +269,7 @@ export const makeMuseumScene = (
     const f32 = new Float32Array(uniformBytes);
 
     const writeStatic = () => {
-      const c = MUSEUM_CONFIG;
+      const c = GALLERY_CONFIG;
       f32[20] = c.corridor.halfWidth;
       f32[21] = c.corridor.height;
       f32[22] = c.corridor.run;
@@ -326,7 +326,7 @@ export const makeMuseumScene = (
     };
     writeStatic();
 
-    const { fog } = MUSEUM_CONFIG;
+    const { fog } = GALLERY_CONFIG;
     const clearValue: GPUColor = {
       r: fog.color[0],
       g: fog.color[1],
@@ -338,7 +338,7 @@ export const makeMuseumScene = (
     let walkDist = 0;
     let yaw = 0;
     let pitch = 0;
-    let fovY = MUSEUM_CONFIG.camera.fovY;
+    let fovY = GALLERY_CONFIG.camera.fovY;
 
     return (time: number) => {
       if (lastTime === 0) lastTime = time;
@@ -353,8 +353,8 @@ export const makeMuseumScene = (
       const dragging = controls.dragModeRef.current === true;
       const walking = controls.isWalkingRef.current === true;
       const targetFovY =
-        controls.targetFovYRef.current ?? MUSEUM_CONFIG.camera.fovY;
-      const camCfg = MUSEUM_CONFIG.camera;
+        controls.targetFovYRef.current ?? GALLERY_CONFIG.camera.fovY;
+      const camCfg = GALLERY_CONFIG.camera;
 
       yaw = wrapAngle(yaw);
       const dWalkPre = target.walkDist - walkDist;
@@ -384,7 +384,7 @@ export const makeMuseumScene = (
       // target (double tap) still pulls the camera smoothly.
       if (walking) {
         const sign = Math.cos(yaw) >= 0 ? 1 : -1;
-        walkDist += sign * MUSEUM_CONFIG.camera.walkSpeed * dt;
+        walkDist += sign * GALLERY_CONFIG.camera.walkSpeed * dt;
         if (target.walkDist < walkDist) {
           target.walkDist = walkDist;
         }
@@ -423,25 +423,25 @@ export const makeMuseumScene = (
       // double-tap ease (sin bob reads as endless image drift).
       const motion = walking ? 1 : 0;
       const bob =
-        Math.sin(walkDist * MUSEUM_CONFIG.camera.bobFrequency) *
-        MUSEUM_CONFIG.camera.bobAmplitude *
+        Math.sin(walkDist * GALLERY_CONFIG.camera.bobFrequency) *
+        GALLERY_CONFIG.camera.bobAmplitude *
         motion;
 
       const camZ = -walkDist;
-      const eyeY = MUSEUM_CONFIG.camera.eyeY + bob;
+      const eyeY = GALLERY_CONFIG.camera.eyeY + bob;
       // Lateral lean: as the camera turns toward a wall, slide toward the
       // opposite wall so the apparent viewing distance grows from
       // halfWidth to halfWidth + lateralLean at yaw = ±π/2. Smooth in yaw,
       // so during a drag the camera "leans back" continuously.
-      const eyeX = -Math.sin(yaw) * MUSEUM_CONFIG.camera.lateralLean;
+      const eyeX = -Math.sin(yaw) * GALLERY_CONFIG.camera.lateralLean;
       const { forward } = cameraBasis(yaw, pitch);
 
       mat4Perspective(
         projMatrix,
         fovY,
         aspect,
-        MUSEUM_CONFIG.camera.near,
-        MUSEUM_CONFIG.camera.far,
+        GALLERY_CONFIG.camera.near,
+        GALLERY_CONFIG.camera.far,
       );
       mat4LookAt(
         viewMatrix,
@@ -484,7 +484,7 @@ export const makeMuseumScene = (
 
       pass.setPipeline(paintingPipeline);
       pass.setBindGroup(0, paintingBindGroup);
-      pass.draw(PAINTING_VERTEX_COUNT, MUSEUM_CONFIG.painting.slotCount);
+      pass.draw(PAINTING_VERTEX_COUNT, GALLERY_CONFIG.painting.slotCount);
 
       pass.end();
       device.queue.submit([encoder.finish()]);

@@ -1,5 +1,5 @@
 /**
- * WGSL for the museum tunnel.
+ * WGSL for the art gallery corridor.
  *
  * Passes share one uniform buffer:
  *   1. Corridor — plaster walls, even-lit brick floor, recessed halo panels + wall bounce,
@@ -8,7 +8,7 @@
  *
  * Wall spots share lattice with ceiling cans.
  */
-export const museumWGSL = /* wgsl */ `
+export const galleryWGSL = /* wgsl */ `
 struct Globals {
   // 64 bytes
   viewProj:        mat4x4f,

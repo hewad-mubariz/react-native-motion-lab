@@ -1,10 +1,10 @@
 /**
- * Tunable constants for the museum tunnel.
+ * Tunable constants for the art gallery corridor.
  *
  * The renderer is engineered so visual tuning lives almost entirely here:
  * change a number, get a new look without touching shader code.
  */
-export const MUSEUM_CONFIG = {
+export const GALLERY_CONFIG = {
   corridor: {
     /** Distance from center to each side wall. Combined with `camera.lateralLean`,
      *  the *effective* viewing distance when rotated 90° is halfWidth + lean.

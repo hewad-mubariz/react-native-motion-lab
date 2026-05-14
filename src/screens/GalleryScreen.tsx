@@ -1,11 +1,11 @@
-import { useMuseumScene } from "@/hooks/useMuseumScene";
-import { MUSEUM_CONFIG } from "@/scenes/museum/config";
+import { useGalleryScene } from "@/hooks/useGalleryScene";
+import { GALLERY_CONFIG } from "@/scenes/gallery/config";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Canvas } from "react-native-wgpu";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const MuseumScreen = () => {
+export const GalleryScreen = () => {
   const insets = useSafeAreaInsets();
   const {
     canvasRef,
@@ -20,7 +20,7 @@ export const MuseumScreen = () => {
     artworksLoading,
     artworkCount,
     loadedArtworkTextures,
-  } = useMuseumScene();
+  } = useGalleryScene();
 
   // Gestures via Race(composed):
   //   - Hold still for ~200ms          -> LongPress -> walk
@@ -29,18 +29,18 @@ export const MuseumScreen = () => {
   //   - Single tap (after double window) -> focus painting / level view
   const longPress = Gesture.LongPress()
     .runOnJS(true)
-    .minDuration(MUSEUM_CONFIG.camera.longPressDuration)
+    .minDuration(GALLERY_CONFIG.camera.longPressDuration)
     // Allow a little finger drift while held without dropping the walk.
     // A real drag will exceed this and Pan should win instead -- but Race
     // has already locked in LongPress at this point, so the drift cap
     // doubles as "stop walking if the finger wanders".
-    .maxDistance(MUSEUM_CONFIG.camera.longPressMaxDistance)
+    .maxDistance(GALLERY_CONFIG.camera.longPressMaxDistance)
     .onStart(handleWalkStart)
     .onFinalize(handleWalkEnd);
 
   const pan = Gesture.Pan()
     .runOnJS(true)
-    .minDistance(MUSEUM_CONFIG.camera.panMinDistance)
+    .minDistance(GALLERY_CONFIG.camera.panMinDistance)
     .onStart(handleDragStart)
     .onUpdate((event) => {
       handleDragUpdate(event.translationX, event.translationY);
