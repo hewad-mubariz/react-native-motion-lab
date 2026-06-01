@@ -1,9 +1,6 @@
 import { BirdsShapeTool, BirdsToolbar } from "@/components/birds-toolbar";
 import { useBirdsScene } from "@/hooks/useBirdsScene";
-import {
-  BIRDS_SKY_PRESETS,
-  BIRDS_SKY_PRESET_COUNT,
-} from "@/scenes/birds";
+import { BIRDS_SKY_PRESETS, BIRDS_SKY_PRESET_COUNT } from "@/scenes/birds";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";

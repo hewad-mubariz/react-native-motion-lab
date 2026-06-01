@@ -2393,6 +2393,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/slider@npm:5.1.2":
+  version: 5.1.2
+  resolution: "@react-native-community/slider@npm:5.1.2"
+  checksum: 10c0/e48f0ad72292ca30d63b84a6c0137bb3531516c22a8a3bd1981132f25e3195c19757da271d5b8b1d66d73882ccef02a0cf21c3a99f23144623345c4eaa67823c
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.83.6":
   version: 0.83.6
   resolution: "@react-native/assets-registry@npm:0.83.6"
@@ -7779,6 +7786,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-motion-lab@workspace:."
   dependencies:
+    "@react-native-community/slider": "npm:5.1.2"
     "@react-navigation/bottom-tabs": "npm:^7.15.5"
     "@react-navigation/elements": "npm:^2.9.10"
     "@react-navigation/native": "npm:^7.1.33"
@@ -7787,6 +7795,7 @@ __metadata:
     eslint: "npm:^9.0.0"
     eslint-config-expo: "npm:~55.0.0"
     expo: "npm:~55.0.23"
+    expo-asset: "npm:~55.0.17"
     expo-constants: "npm:~55.0.16"
     expo-device: "npm:~55.0.16"
     expo-font: "npm:~55.0.7"

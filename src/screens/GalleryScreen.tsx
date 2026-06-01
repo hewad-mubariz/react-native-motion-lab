@@ -2,8 +2,8 @@ import { useGalleryScene } from "@/hooks/useGalleryScene";
 import { GALLERY_CONFIG } from "@/scenes/gallery/config";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Canvas } from "react-native-wgpu";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Canvas } from "react-native-wgpu";
 
 export const GalleryScreen = () => {
   const insets = useSafeAreaInsets();

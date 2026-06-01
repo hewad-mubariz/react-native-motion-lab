@@ -1,7 +1,7 @@
 import type { BirdsShapeTool } from "@/components/birds-toolbar";
+import { makeBirdsScene, type DisturbanceState } from "@/scenes/birds";
 import { useEffect, useMemo, useRef } from "react";
 import { LayoutChangeEvent } from "react-native";
-import { makeBirdsScene, type DisturbanceState } from "@/scenes/birds";
 import { useWebGPU } from "./useWebGPU";
 
 interface UseBirdsSceneOptions {

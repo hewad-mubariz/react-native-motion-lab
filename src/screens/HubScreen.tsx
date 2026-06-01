@@ -51,6 +51,24 @@ export const HubScreen = () => {
           </View>
           <Ionicons name="chevron-forward" size={22} color="rgba(8,10,16,0.35)" />
         </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open pixel explosion scene"
+          onPress={() => router.push("/pixel-explosion")}
+          style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+        >
+          <Ionicons
+            name="sparkles"
+            size={34}
+            color="rgba(8, 10, 16, 0.92)"
+          />
+          <View style={styles.cardText}>
+            <Text style={styles.cardTitle}>Pixel explosion</Text>
+            <Text style={styles.cardHint}>Tiger reform effect</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={22} color="rgba(8,10,16,0.35)" />
+        </Pressable>
       </View>
     </View>
   );
