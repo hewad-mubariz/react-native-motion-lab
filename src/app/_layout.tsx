@@ -27,6 +27,7 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" />
             <Stack.Screen name="birds" />
+            <Stack.Screen name="card-flip" />
             <Stack.Screen name="gallery" />
             <Stack.Screen name="pixel-explosion" />
           </Stack>

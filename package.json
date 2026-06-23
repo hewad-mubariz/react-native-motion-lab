@@ -11,10 +11,12 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/ui": "~55.0.17",
     "@react-native-community/slider": "5.1.2",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
+    "@shopify/react-native-skia": "2.6.4",
     "expo": "~55.0.23",
     "expo-asset": "~55.0.17",
     "expo-constants": "~55.0.16",
@@ -24,6 +26,7 @@
     "expo-image": "~55.0.10",
     "expo-linking": "~55.0.15",
     "expo-router": "~55.0.14",
+    "expo-sensors": "~55.0.15",
     "expo-splash-screen": "~55.0.20",
     "expo-status-bar": "~55.0.6",
     "expo-symbols": "~55.0.8",
@@ -33,12 +36,12 @@
     "react-dom": "19.2.0",
     "react-native": "0.83.6",
     "react-native-gesture-handler": "~2.30.0",
-    "react-native-reanimated": "4.2.1",
+    "react-native-reanimated": "4.4.0",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.23.0",
     "react-native-web": "~0.21.0",
     "react-native-wgpu": "^0.5.11",
-    "react-native-worklets": "0.7.4"
+    "react-native-worklets": "0.9.1"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
@@ -47,5 +50,6 @@
     "eslint-config-expo": "~55.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@4.5.0"
 }
