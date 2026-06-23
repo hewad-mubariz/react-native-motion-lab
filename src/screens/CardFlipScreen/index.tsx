@@ -21,11 +21,11 @@ import { FrontContent } from "./FrontContent";
 import { CARD_NUMBER_FONT_FAMILY, CARD_REFRACTION, CARD_SHIMMER } from "./constants";
 import { styles } from "./styles";
 
-const GYRO_RANGE_X_DEG = 32;
-const GYRO_RANGE_Y_DEG = 26;
-const MOTION_SMOOTHING = 0.16;
-const TILT_X_DEG = 8; // max rotateX from forward/back tilt
-const TILT_Y_DEG = 5; // max rotateY overlay from left/right tilt
+const GYRO_RANGE_X_DEG = 22;
+const GYRO_RANGE_Y_DEG = 18;
+const MOTION_SMOOTHING = 0.07;
+const TILT_X_DEG = 10;
+const TILT_Y_DEG = 8;
 
 const clampUnit = (value: number) => Math.max(-1, Math.min(1, value));
 const radToDeg = (value: number) => (value * 180) / Math.PI;
@@ -33,30 +33,30 @@ const radToDeg = (value: number) => (value * 180) / Math.PI;
 function applyMotionFeel(value: number) {
   "worklet";
   const sign = value < 0 ? -1 : 1;
-  return sign * Math.pow(Math.min(1, Math.abs(value)), 0.82);
+  return sign * Math.pow(Math.min(1, Math.abs(value)), 0.92);
 }
 
 function CardFace({
   rotY,
   offset,
   absolute,
-  lightX,
-  lightY,
+  motionX,
+  motionY,
   children,
 }: {
   rotY: SharedValue<number>;
   offset: number;
   absolute?: boolean;
-  lightX: SharedValue<number>;
-  lightY: SharedValue<number>;
+  motionX: SharedValue<number>;
+  motionY: SharedValue<number>;
   children: React.ReactNode;
 }) {
   const animStyle = useAnimatedStyle(() => ({
     ...(absolute ? { position: "absolute" as const, top: 0, left: 0 } : {}),
     transform: [
       { perspective: 900 },
-      { rotateX: `${lightY.value * TILT_X_DEG}deg` },
-      { rotateY: `${rotY.value + offset + lightX.value * TILT_Y_DEG}deg` },
+      { rotateX: `${motionY.value * TILT_X_DEG}deg` },
+      { rotateY: `${rotY.value + offset + motionX.value * TILT_Y_DEG}deg` },
     ],
     backfaceVisibility: "hidden" as const,
   }));
@@ -78,6 +78,8 @@ export function CardFlipScreen() {
   const lightY = useSharedValue(0);
   const rawLightX = useSharedValue(0);
   const rawLightY = useSharedValue(0);
+  const smoothMotionX = useSharedValue(0);
+  const smoothMotionY = useSharedValue(0);
 
   useEffect(() => {
     clock.value = withRepeat(
@@ -90,6 +92,7 @@ export function CardFlipScreen() {
   useEffect(() => {
     let cancelled = false;
     let subscription: { remove: () => void } | undefined;
+    let restingGamma: number | undefined;
     let restingBeta: number | undefined;
 
     const startMotion = async () => {
@@ -100,15 +103,16 @@ export function CardFlipScreen() {
         const permission = await DeviceMotion.requestPermissionsAsync();
         if (!permission.granted || cancelled) return;
 
-        DeviceMotion.setUpdateInterval(16);
+        DeviceMotion.setUpdateInterval(33);
         subscription = DeviceMotion.addListener(({ rotation }) => {
           if (!rotation) return;
 
           const gamma = rotation.gamma ?? 0;
           const beta = rotation.beta ?? 0;
+          restingGamma ??= gamma;
           restingBeta ??= beta;
 
-          rawLightX.value = clampUnit(radToDeg(gamma) / GYRO_RANGE_X_DEG);
+          rawLightX.value = clampUnit(radToDeg(gamma - restingGamma) / GYRO_RANGE_X_DEG);
           rawLightY.value = clampUnit(radToDeg(beta - restingBeta) / GYRO_RANGE_Y_DEG);
         });
       } catch {
@@ -125,13 +129,15 @@ export function CardFlipScreen() {
     };
   }, [rawLightX, rawLightY]);
 
-  useFrameCallback(() => {
+  useFrameCallback(({ timeSincePreviousFrame }) => {
     "worklet";
-    const nextX = lightX.value + (rawLightX.value - lightX.value) * MOTION_SMOOTHING;
-    const nextY = lightY.value + (rawLightY.value - lightY.value) * MOTION_SMOOTHING;
+    const frameMs = timeSincePreviousFrame ?? 16.67;
+    const alpha = 1 - Math.pow(1 - MOTION_SMOOTHING, frameMs / 16.67);
+    smoothMotionX.value += (rawLightX.value - smoothMotionX.value) * alpha;
+    smoothMotionY.value += (rawLightY.value - smoothMotionY.value) * alpha;
 
-    lightX.value = applyMotionFeel(nextX);
-    lightY.value = applyMotionFeel(nextY);
+    lightX.value = applyMotionFeel(smoothMotionX.value);
+    lightY.value = applyMotionFeel(smoothMotionY.value);
   });
 
   const flipAbs = useDerivedValue(() =>
@@ -179,11 +185,11 @@ export function CardFlipScreen() {
       <GestureDetector gesture={gesture}>
         <Animated.View style={styles.shadowWrap}>
           <View style={styles.cardContainer}>
-            <CardFace rotY={rotY} offset={0} lightX={lightX} lightY={lightY}>
+            <CardFace rotY={rotY} offset={0} motionX={lightX} motionY={lightY}>
               <FaceShader {...shaderProps} isFront />
               <FrontContent isNumberFontReady={fontsLoaded} lightX={lightX} lightY={lightY} />
             </CardFace>
-            <CardFace rotY={rotY} offset={180} absolute lightX={lightX} lightY={lightY}>
+            <CardFace rotY={rotY} offset={180} absolute motionX={lightX} motionY={lightY}>
               <FaceShader {...shaderProps} isFront={false} />
               <BackContent lightX={lightX} lightY={lightY} />
             </CardFace>
