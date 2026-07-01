@@ -30,6 +30,7 @@ export default function RootLayout() {
             <Stack.Screen name="card-flip" />
             <Stack.Screen name="gallery" />
             <Stack.Screen name="pixel-explosion" />
+            <Stack.Screen name="furniture-showcase" />
           </Stack>
         </View>
       </SafeAreaProvider>

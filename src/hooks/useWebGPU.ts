@@ -22,9 +22,12 @@ export type Scene = (
 
 export interface UseWebGPUOptions {
   alphaMode?: GPUCanvasAlphaMode;
+  onError?: (error: unknown) => void;
+  onReady?: () => void;
 }
 
 export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
+  const { alphaMode = "premultiplied", onError, onReady } = options;
   const { device } = useDevice();
   const canvasRef = useRef<CanvasRef>(null);
   const animationFrameId = useRef<number | null>(null);
@@ -47,7 +50,7 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
       context.configure({
         device,
         format: presentationFormat,
-        alphaMode: options.alphaMode ?? "premultiplied",
+        alphaMode,
       });
 
       const sceneProps: SceneProps = {
@@ -58,13 +61,24 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
         canvas: context.canvas as unknown as NativeCanvas,
       };
 
-      const result = scene(sceneProps);
-      const renderScene =
-        result instanceof Promise ? await result : (result as RenderScene);
+      let renderScene: RenderScene | void;
+
+      try {
+        const result = scene(sceneProps);
+        renderScene =
+          result instanceof Promise ? await result : (result as RenderScene);
+      } catch (error) {
+        if (!cancelled) {
+          onError?.(error);
+        }
+        return;
+      }
 
       if (cancelled || typeof renderScene !== "function") {
         return;
       }
+
+      onReady?.();
 
       const render = () => {
         if (cancelled) {
@@ -85,7 +99,7 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
         animationFrameId.current = null;
       }
     };
-  }, [device, scene, options.alphaMode]);
+  }, [alphaMode, device, onError, onReady, scene]);
 
   return canvasRef;
 };
