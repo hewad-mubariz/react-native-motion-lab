@@ -23,6 +23,7 @@
     "expo-device": "~55.0.16",
     "expo-font": "~55.0.7",
     "expo-glass-effect": "~55.0.11",
+    "expo-haptics": "^57.0.0",
     "expo-image": "~55.0.10",
     "expo-linking": "~55.0.15",
     "expo-router": "~55.0.14",
