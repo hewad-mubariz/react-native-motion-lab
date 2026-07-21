@@ -81,6 +81,24 @@ export const HubScreen = () => {
 
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="Open salon seat selection"
+          onPress={() => router.push("/salon-selection")}
+          style={({ pressed }) => [
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder, shadowColor: colors.shadowColor },
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <MaterialCommunityIcons name="seat-recline-normal" size={34} color={colors.icon} />
+          <View style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>Salon selection</Text>
+            <Text style={[styles.cardHint, { color: colors.textSub }]}>Cinema seats</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={22} color={colors.iconChevron} />
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel="Open card flip scene"
           onPress={() => router.push("/card-flip")}
           style={({ pressed }) => [
