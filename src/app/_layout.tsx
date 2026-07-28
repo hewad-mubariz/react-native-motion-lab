@@ -6,8 +6,6 @@ import React, { useEffect } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { DarkModeOverlay } from "../components/DarkModeOverlay";
-import { ThemeProvider, useTheme } from "../context/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,11 +15,9 @@ const stackAnimations =
     : ("default" as const);
 
 function AppShell() {
-  const { colors, isDark } = useTheme();
-
   return (
-    <View style={[styles.chrome, { backgroundColor: colors.background }]}>
-      <StatusBar style={isDark ? "light" : "dark"} />
+    <View style={styles.chrome}>
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -37,11 +33,12 @@ function AppShell() {
         <Stack.Screen name="birds" />
         <Stack.Screen name="card-flip" />
         <Stack.Screen name="gallery" />
+        <Stack.Screen name="salon-selection" />
+        <Stack.Screen name="stadium-selection" />
         <Stack.Screen name="pixel-explosion" />
         <Stack.Screen name="furniture-showcase" />
         <Stack.Screen name="bar-chart" />
       </Stack>
-      <DarkModeOverlay />
     </View>
   );
 }
@@ -64,9 +61,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.chrome}>
       <SafeAreaProvider>
-        <ThemeProvider>
-          <AppShell />
-        </ThemeProvider>
+        <AppShell />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
@@ -75,5 +70,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   chrome: {
     flex: 1,
+    backgroundColor: "#ffffff",
   },
 });

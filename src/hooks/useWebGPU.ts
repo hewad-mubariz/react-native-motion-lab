@@ -14,7 +14,8 @@ export interface SceneProps {
   canvas: NativeCanvas;
 }
 
-export type RenderScene = (timestamp: number) => void;
+// May return false to signal nothing was drawn this frame (informational only).
+export type RenderScene = (timestamp: number) => boolean | void;
 
 export type Scene = (
   props: SceneProps,
@@ -22,18 +23,25 @@ export type Scene = (
 
 export interface UseWebGPUOptions {
   alphaMode?: GPUCanvasAlphaMode;
+  maxPixelRatio?: number;
   onError?: (error: unknown) => void;
   onReady?: () => void;
+  // Caller may pass a ref to receive a function that wakes the render loop
+  // when it is in a reduced-rate idle state (for future use).
+  wakeRef?: React.RefObject<(() => void) | null>;
 }
 
 export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
-  const { alphaMode = "premultiplied", onError, onReady } = options;
+  const { alphaMode = "premultiplied", maxPixelRatio = 2, onError, onReady, wakeRef } = options;
   const { device } = useDevice();
   const canvasRef = useRef<CanvasRef>(null);
   const animationFrameId = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
+    // Expose a no-op wake function so callers don't need to guard wakeRef.
+    if (wakeRef) (wakeRef as React.MutableRefObject<(() => void) | null>).current = () => {};
 
     (async () => {
       const context = canvasRef.current?.getContext("webgpu");
@@ -44,8 +52,9 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
       const canvas = context.canvas as HTMLCanvasElement;
       const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-      canvas.width = canvas.clientWidth * PixelRatio.get();
-      canvas.height = canvas.clientHeight * PixelRatio.get();
+      const pixelRatio = Math.min(PixelRatio.get(), maxPixelRatio);
+      canvas.width = canvas.clientWidth * pixelRatio;
+      canvas.height = canvas.clientHeight * pixelRatio;
 
       context.configure({
         device,
@@ -81,10 +90,9 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
       onReady?.();
 
       const render = () => {
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
         renderScene(Date.now());
+        // present() must be called every tick to keep the display pipeline alive.
         context.present();
         animationFrameId.current = requestAnimationFrame(render);
       };
@@ -94,12 +102,13 @@ export const useWebGPU = (scene: Scene, options: UseWebGPUOptions = {}) => {
 
     return () => {
       cancelled = true;
+      if (wakeRef) (wakeRef as React.MutableRefObject<(() => void) | null>).current = null;
       if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
       }
     };
-  }, [alphaMode, device, onError, onReady, scene]);
+  }, [alphaMode, device, maxPixelRatio, onError, onReady, scene, wakeRef]);
 
   return canvasRef;
 };

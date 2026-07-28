@@ -1,44 +1,29 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useRouter, type Href } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "../context/ThemeContext";
+
+const colors = {
+  background: "#ffffff",
+  card: "rgba(255,255,255,0.98)",
+  cardBorder: "rgba(0,0,0,0.09)",
+  text: "rgba(8,10,16,0.92)",
+  textSub: "rgba(8,10,16,0.45)",
+  kicker: "rgba(0,0,0,0.38)",
+  icon: "rgba(8,10,16,0.92)",
+  iconChevron: "rgba(8,10,16,0.35)",
+  shadowColor: "#000000",
+} as const;
 
 export const HubScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, isDark, toggleTheme } = useTheme();
-  const toggleRef = useRef<View>(null);
 
   const padTop = insets.top + 28;
   const padBottom = insets.bottom + 28;
 
-  const handleToggle = () => {
-    toggleRef.current?.measure((_x, _y, w, h, pageX, pageY) => {
-      toggleTheme(pageX + w / 2, pageY + h / 2);
-    });
-  };
-
   return (
     <View style={[styles.screen, { paddingTop: padTop, paddingBottom: padBottom, backgroundColor: colors.background }]}>
-      {/* Dark mode toggle */}
-      <View ref={toggleRef} style={[styles.toggleWrap, { top: insets.top + 14, borderColor: colors.cardBorder, backgroundColor: colors.card }]}>
-        <Pressable
-          onPress={handleToggle}
-          hitSlop={12}
-          style={({ pressed }) => [styles.toggleBtn, pressed && { opacity: 0.7 }]}
-          accessibilityLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          accessibilityRole="button"
-        >
-          <Ionicons
-            name={isDark ? 'sunny' : 'moon'}
-            size={20}
-            color={colors.icon}
-          />
-        </Pressable>
-      </View>
-
       <Text style={[styles.kicker, { color: colors.kicker }]}>Birds</Text>
       <Text style={[styles.title, { color: colors.text }]}>Choose a scene</Text>
 
@@ -93,6 +78,24 @@ export const HubScreen = () => {
           <View style={styles.cardText}>
             <Text style={[styles.cardTitle, { color: colors.text }]}>Salon selection</Text>
             <Text style={[styles.cardHint, { color: colors.textSub }]}>Cinema seats</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={22} color={colors.iconChevron} />
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open football stadium seat selection"
+          onPress={() => router.push("/stadium-selection" as Href)}
+          style={({ pressed }) => [
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder, shadowColor: colors.shadowColor },
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <MaterialCommunityIcons name="stadium" size={34} color={colors.icon} />
+          <View style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>Football stadium</Text>
+            <Text style={[styles.cardHint, { color: colors.textSub }]}>Match seats</Text>
           </View>
           <Ionicons name="chevron-forward" size={22} color={colors.iconChevron} />
         </Pressable>
@@ -177,24 +180,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     paddingHorizontal: 22,
-  },
-  toggleWrap: {
-    position: 'absolute',
-    right: 22,
-    borderRadius: 20,
-    borderWidth: StyleSheet.hairlineWidth,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  toggleBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
   },
   kicker: {
     fontSize: 12,
